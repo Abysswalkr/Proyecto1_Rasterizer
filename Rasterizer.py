@@ -11,7 +11,7 @@ screen = pygame.display.set_mode((width, height), pygame.SCALED)
 clock = pygame.time.Clock()
 
 rend = Renderer(screen)
-
+rend.glLoadBackground('textures/wallpaper.bmp')
 
 modelo1 = Model('models/cat.obj')
 modelo1.loadTexture('textures/cat.bmp')
@@ -35,7 +35,8 @@ modelo2.scale[2] = 1.5
 
 modelo3 = Model('models/cat.obj')
 modelo3.loadTexture('textures/cat.bmp')
-modelo3.stripedShader = stripedShader
+modelo3.vertexShader = vertexShader
+modelo3.fragmentShader = fragmentShader
 modelo3.translate[2] = -5
 modelo3.translate[0] = 2
 modelo3.scale[0] = 1.5
@@ -45,6 +46,7 @@ modelo3.scale[2] = 1.5
 rend.models.append(modelo1)
 rend.models.append(modelo2)
 rend.models.append(modelo3)
+
 
 isRunning = True
 while isRunning:
@@ -82,9 +84,10 @@ while isRunning:
                 rend.camera.translate[1] -= 1
 
     rend.glClear()
+    rend.glClearBackground()
 
     rend.glRender()
-    #rend.glTriangle(puntoA, puntoB, puntoC)
+    # rend.glTriangle(puntoA, puntoB, puntoC)
 
     pygame.display.flip()
     clock.tick(60)
