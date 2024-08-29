@@ -296,3 +296,98 @@ def waterShader(**kwargs):
     b = max(0, min(1, b))
 
     return [r, g, b]
+
+import math
+
+def heatDistortionShader(**kwargs):
+    A, B, C = kwargs["verts"]
+    u, v, w = kwargs["bCoords"]
+    texture = kwargs["texture"]
+
+    # Interpolación de coordenadas de textura
+    vtA, vtB, vtC = [A[3], A[4]], [B[3], B[4]], [C[3], C[4]]
+    vtP = [u * vtA[0] + v * vtB[0] + w * vtC[0], u * vtA[1] + v * vtB[1] + w * vtC[1]]
+
+    # Parámetros de distorsión
+    distortion_strength = 0.02  # Intensidad de la distorsión
+    wave_frequency = 30.0  # Frecuencia de las ondas de calor
+    wave_amplitude = 0.05  # Amplitud de las ondas de calor
+
+    # Simulación de las ondas de calor en el aire
+    time = kwargs.get("time", 0)  # Parámetro de tiempo para animar el efecto
+    distortion_x = math.sin(vtP[0] * wave_frequency + time) * wave_amplitude
+    distortion_y = math.cos(vtP[1] * wave_frequency + time) * wave_amplitude
+
+    # Aplicar la distorsión a las coordenadas de la textura
+    distorted_vtP = [vtP[0] + distortion_x * distortion_strength, vtP[1] + distortion_y * distortion_strength]
+
+    # Obtener el color de la textura en la coordenada distorsionada
+    if texture:
+        texColor = texture.getColor(distorted_vtP[0], distorted_vtP[1])
+    else:
+        texColor = [1.0, 1.0, 1.0]  # Color blanco por defecto si no hay textura
+
+    # Atenuar ligeramente los colores para dar un efecto de calor
+    attenuation = 0.9
+    r = texColor[0] * attenuation
+    g = texColor[1] * attenuation
+    b = texColor[2] * attenuation
+
+    # Variación de brillo para simular la distorsión por calor
+    brightness_variation = math.sin(vtP[1] * 10.0 + time * 5.0) * 0.1
+    r += brightness_variation
+    g += brightness_variation
+    b += brightness_variation
+
+    # Limitar los valores de color entre 0 y 1
+    r = max(0, min(1, r))
+    g = max(0, min(1, g))
+    b = max(0, min(1, b))
+
+    return [r, g, b]
+
+import math
+
+def dissolveShader(**kwargs):
+    A, B, C = kwargs["verts"]
+    u, v, w = kwargs["bCoords"]
+    texture = kwargs["texture"]
+
+    # Interpolación de coordenadas de textura
+    vtA, vtB, vtC = [A[3], A[4]], [B[3], B[4]], [C[3], C[4]]
+    vtP = [u * vtA[0] + v * vtB[0] + w * vtC[0], u * vtA[1] + v * vtB[1] + w * vtC[1]]
+
+    # Parámetro de disolución (se puede animar este valor para el efecto)
+    dissolve_threshold = kwargs.get("dissolve_threshold", 0.5)  # 0.0 a 1.0
+    edge_width = 0.1  # Grosor del borde de disolución
+    edge_color = [1.0, 0.5, 0.0]  # Color del borde (naranja-rojizo para simular quema)
+
+    # Generación de ruido para la disolución
+    noise = math.sin(vtP[0] * 10.0 + math.cos(vtP[1] * 10.0)) * 0.5 + 0.5
+
+    # Obtener el color de la textura
+    if texture:
+        texColor = texture.getColor(vtP[0], vtP[1])
+    else:
+        texColor = [1.0, 1.0, 1.0]  # Color blanco por defecto si no hay textura
+
+    # Aplicar la disolución en función del ruido y el umbral
+    if noise < dissolve_threshold:
+        # Dentro del rango de disolución, desvanecer el color
+        r = texColor[0] * (noise / dissolve_threshold)
+        g = texColor[1] * (noise / dissolve_threshold)
+        b = texColor[2] * (noise / dissolve_threshold)
+    else:
+        # En el borde de disolución, aplicar el color del borde
+        edge_factor = (noise - dissolve_threshold) / edge_width
+        r = edge_color[0] * edge_factor + texColor[0] * (1 - edge_factor)
+        g = edge_color[1] * edge_factor + texColor[1] * (1 - edge_factor)
+        b = edge_color[2] * edge_factor + texColor[2] * (1 - edge_factor)
+
+    # Limitar los valores de color entre 0 y 1
+    r = max(0, min(1, r))
+    g = max(0, min(1, g))
+    b = max(0, min(1, b))
+
+    return [r, g, b]
+
