@@ -10,30 +10,28 @@ class Obj(object):
 
         for line in lines:
             line = line.rstrip()
-            if not line or line.startswith("#"):
-                continue
 
             try:
                 prefix, value = line.split(" ", 1)
-            except ValueError:
+            except:
                 continue
 
             if prefix == "v":  # Vertices
-                vert = list(map(float, value.split()))
+                vert = list(map(float, value.split(" ")))
                 self.vertices.append(vert)
 
-            elif prefix == "vt":  # Texture coordinates
-                vts = list(map(float, value.split()))
+            elif prefix == "vt":  # Coordenadas de textura
+                vts = list(map(float, value.split(" ")))
                 self.texcoords.append([vts[0], vts[1]])
 
-            elif prefix == "vn":  # Normals
-                norm = list(map(float, value.split()))
+            elif prefix == "vn":  # Normales
+                norm = list(map(float, value.split(" ")))
                 self.normals.append(norm)
 
-            elif prefix == "f":  # Faces
+            elif prefix == "f":  # Caras
                 face = []
-                verts = value.split()
+                verts = value.split(" ")
                 for vert in verts:
-                    vert = [int(v) if v else None for v in vert.split("/")]
+                    vert = list(map(int, vert.split("/")))
                     face.append(vert)
                 self.faces.append(face)

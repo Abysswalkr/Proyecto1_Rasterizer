@@ -1,4 +1,3 @@
-
 import struct
 
 class Texture(object):
@@ -32,11 +31,3 @@ class Texture(object):
 			return self.pixels[int(v * self.height)][int(u * self.width)]
 		else:
 			return None
-
-
-
-
-
-
-
-

@@ -1,6 +1,5 @@
 from MathLib import *
 
-
 class Camera(object):
     def __init__(self):
         self.translate = [0, 0, 0]

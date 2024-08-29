@@ -46,7 +46,7 @@ class Renderer(object):
 
         self.directionalLight = [1, 0, 0]
 
-        self.primitiveType = POINTS
+        self.primitiveType = TRIANGLES
 
         self.models = []
 
@@ -222,13 +222,12 @@ class Renderer(object):
             mMat = model.GetModelMatrix()
             self.activeVertexShader = model.vertexShader
             self.activeFragmentShader = model.fragmentShader
-            # Guardar la referencia a la textura de este modelo
             self.activeTexture = model.texture
 
             # Aqui vamos a guardar todos los vertices y su info correspondiente
             vertexBuffer = []
 
-            # Para cada cara del modelo, recorremos la info de v rtices de esa cara
+            # Para cada cara del modelo, recorremos la info de v�rtices de esa cara
             for face in model.faces:
 
                 # Aqui vamos a guardar los vertices de esta cara
@@ -269,7 +268,7 @@ class Renderer(object):
                     normal = model.normals[face[i][2] - 1]
 
                     # Obtenemos los valores de las normales al contenedor de vertices
-                    for values in normal:
+                    for value in normal:
                         vert.append(value)
 
                     # Agregamos la informacion de este vertices a la
@@ -406,20 +405,23 @@ class Renderer(object):
         if not isclose(u + v + w, 1.0):
             return
 
-        # Se calcula valor de este pixel especifico
+        # Calcula valor de este pixel especifico
+
         z = u * A[2] + v * B[2] + w * C[2]
+
+        if z >= self.zbuffer[x][y]:
+            return
 
         self.zbuffer[x][y] = z
 
-        # Si el valor en z para este punto no esta entre -1 y 1 se puede descartar
         if z < -1 or z > 1:
             return  # no lo dibuijamos
 
-        # Si contamos un Fragment Shader, obtener el color de ah
+        # Si contamos un Fragment Shader, obtener el color de ah�
         color = self.currColor
 
         if self.activeFragmentShader != None:
-            # Mandar los par metros necesarios al shader
+            # Mandar los par�metros necesarios al shader
             verts = (A, B, C)
             color = self.activeFragmentShader(verts=verts,
                                               bCoords=bCoords,
